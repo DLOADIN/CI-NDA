@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - CI-NDA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: #141414;
+            color: white;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background-color: #141414;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #e50914;
+            letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #b3b3b3;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            background: #e50914;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: #2a2a2a;
+            border-radius: 4px;
+            min-width: 200px;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 14px;
+        }
+
+        .dropdown-item:hover {
+            background: #3a3a3a;
+        }
+
+        .dropdown-item:first-child {
+            border-radius: 4px 4px 0 0;
+        }
+
+        .dropdown-item:last-child {
+            border-radius: 0 0 4px 4px;
+            color: #e50914;
+            border-top: 1px solid #3a3a3a;
+        }
+
+        .main-content {
+            padding: 100px 50px 50px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, #e50914 0%, #b20710 100%);
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+        }
+
+        .welcome-banner h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .welcome-banner p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .profile-header {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 50px;
+            background: #1a1a1a;
+            padding: 40px;
+            border-radius: 8px;
+        }
+
+        .profile-image-section {
+            flex-shrink: 0;
+        }
+
+        .profile-image {
+            width: 180px;
+            height: 180px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            margin-bottom: 15px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .change-photo-btn {
+            width: 100%;
+            padding: 10px;
+            background: #2a2a2a;
+            border: none;
+            color: white;
+            font-size: 13px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .change-photo-btn:hover {
+            background: #3a3a3a;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .profile-role {
+            font-size: 18px;
+            color: #46d369;
+            margin-bottom: 20px;
+        }
+
+        .profile-bio {
+            font-size: 15px;
+            color: #b3b3b3;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 25px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: #e50914;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-primary {
+            padding: 12px 25px;
+            background: #e50914;
+            border: none;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #f40612;
+        }
+
+        .btn-secondary {
+            padding: 12px 25px;
+            background: #2a2a2a;
+            border: none;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: #3a3a3a;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .tab {
+            padding: 15px 0;
+            font-size: 16px;
+            color: #b3b3b3;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: white;
+            border-bottom-color: #e50914;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .portfolio-item {
+            background: #2a2a2a;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .portfolio-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(229, 9, 20, 0.3);
+        }
+
+        .portfolio-thumbnail {
+            width: 100%;
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .portfolio-thumbnail::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to top, rgba(42, 42, 42, 1), transparent);
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(229, 9, 20, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 2;
+        }
+
+        .portfolio-item:hover .play-overlay {
+            opacity: 1;
+        }
+
+        .portfolio-info {
+            padding: 15px;
+        }
+
+        .portfolio-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .portfolio-meta {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .activity-list {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .activity-item {
+            padding: 15px;
+            border-left: 3px solid #e50914;
+            margin-bottom: 15px;
+            background: #2a2a2a;
+            border-radius: 4px;
+        }
+
+        .activity-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .activity-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .settings-form {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 800px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #b3b3b3;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #e50914;
+        }
+
+        textarea.form-input {
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .upload-area {
+            border: 2px dashed #3a3a3a;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: #e50914;
+            background: #1a1a1a;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 20px;
+            }
+
+            .main-content {
+                padding: 100px 20px 50px;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .profile-stats {
+                justify-content: center;
+            }
+
+            .tabs {
+                overflow-x: auto;
+                gap: 15px;
+            }
+
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<script src="public/js/auth-utils.js"></script>
+<script src="public/js/api.js"></script>
+<script src="public/js/api-init.js"></script>
+    <nav class="navbar">
+        <div class="logo" onclick="window.location.href='index.html'">CI-NDA</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="courses.html">Courses</a>
+            <a href="opportunities.html">Opportunities</a>
+            <a href="mentorship.html">Mentorship</a>
+            <a href="portfolios.html">Portfolios</a>
+        </div>
+        <div class="nav-right">
+            <div class="user-menu">
+                <div class="user-avatar" onclick="toggleDropdown()">
+                    <span id="userInitials">FM</span>
+                </div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <div class="dropdown-item" onclick="window.location.href='profile.html'">My Profile</div>
+                    <div class="dropdown-item" onclick="switchTab('settings')">Account Settings</div>
+                    <div class="dropdown-item">Help Center</div>
+                    <div class="dropdown-item" onclick="logout()">Sign Out</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <h2>Welcome back, <span id="welcomeName">Filmmaker</span>!</h2>
+            <p>Continue building your filmmaking career with CI-NDA</p>
+        </div>
+
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-image-section">
+                <div class="profile-image" id="profileImage" style="background-image: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80');">
+                </div>
+                <button class="change-photo-btn">Change Photo</button>
+            </div>
+
+            <div class="profile-info">
+                <h1 class="profile-name" id="userName">John Filmmaker</h1>
+                <p class="profile-role" id="userRole">Filmmaker & Content Creator</p>
+                <p class="profile-bio" id="userBio">Passionate filmmaker dedicated to telling authentic Rwandan stories through compelling visuals and meaningful narratives.</p>
+                
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-value">12</span>
+                        <span class="stat-label">Projects</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">2.5K</span>
+                        <span class="stat-label">Followers</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">48</span>
+                        <span class="stat-label">Following</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">3</span>
+                        <span class="stat-label">Awards</span>
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <button class="btn-primary" onclick="alert('Edit profile functionality coming soon!')">Edit Profile</button>
+                    <button class="btn-secondary" onclick="alert('Share profile functionality coming soon!')">Share Profile</button>
+                    <button class="btn-secondary" onclick="alert('Public profile view coming soon!')">View Public Profile</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('portfolio')">Portfolio</div>
+            <div class="tab" onclick="switchTab('activity')">Activity</div>
+            <div class="tab" onclick="switchTab('mentorship')">Mentorship</div>
+            <div class="tab" onclick="switchTab('settings')">Settings</div>
+        </div>
+
+        <!-- Portfolio Tab -->
+        <div class="tab-content active" id="portfolioTab">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2 class="section-title">My Projects</h2>
+                <button class="btn-primary" onclick="alert('Upload functionality coming soon!')">+ Upload New Project</button>
+            </div>
+
+            <div class="upload-area" onclick="alert('Click to upload your films, trailers, or showreels')">
+                <div class="upload-icon">📤</div>
+                <h3>Upload Your First Project</h3>
+                <p style="color: #999; margin-top: 10px;">Drag and drop files here or click to browse</p>
+            </div>
+
+            <div class="portfolio-grid">
+                <div class="portfolio-item">
+                    <div class="portfolio-thumbnail" style="background-image: url('https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=600&q=80');">
+                        <div class="play-overlay">▶</div>
+                    </div>
+                    <div class="portfolio-info">
+                        <div class="portfolio-title">Urban Dreams</div>
+                        <div class="portfolio-meta">Short Film • 2024 • 1.2K views</div>
+                    </div>
+                </div>
+
+                <div class="portfolio-item">
+                    <div class="portfolio-thumbnail" style="background-image: url('https://images.unsplash.com/photo-1485846234645-a62644f84728?w=600&q=80');">
+                        <div class="play-overlay">▶</div>
+                    </div>
+                    <div class="portfolio-info">
+                        <div class="portfolio-title">Heritage Stories</div>
+                        <div class="portfolio-meta">Documentary • 2024 • 3.5K views</div>
+                    </div>
+                </div>
+
+                <div class="portfolio-item">
+                    <div class="portfolio-thumbnail" style="background-image: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&q=80');">
+                        <div class="play-overlay">▶</div>
+                    </div>
+                    <div class="portfolio-info">
+                        <div class="portfolio-title">Night Rhythms</div>
+                        <div class="portfolio-meta">Music Video • 2023 • 5.8K views</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Tab -->
+        <div class="tab-content" id="activityTab">
+            <h2 class="section-title">Recent Activity</h2>
+            <div class="activity-list">
+                <div class="activity-item">
+                    <div class="activity-title">✅ Completed "Advanced Cinematography" Course</div>
+                    <div class="activity-time">2 days ago</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-title">📝 Applied to International Film Festival</div>
+                    <div class="activity-time">5 days ago</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-title">🤝 Started mentorship with Sarah Mitchell</div>
+                    <div class="activity-time">1 week ago</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-title">🎬 Uploaded "Urban Dreams" to portfolio</div>
+                    <div class="activity-time">2 weeks ago</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-title">🎉 Joined CI-NDA Platform</div>
+                    <div class="activity-time">1 month ago</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mentorship Tab -->
+        <div class="tab-content" id="mentorshipTab">
+            <h2 class="section-title">My Mentorship</h2>
+            <div class="activity-list">
+                <div class="activity-item">
+                    <div class="activity-title">📅 Upcoming Session with Sarah Mitchell</div>
+                    <div class="activity-time">Tomorrow at 3:00 PM • Cinematography Review</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-title">✅ Completed Session: Portfolio Review</div>
+                    <div class="activity-time">Last week • with Sarah Mitchell</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-title">💬 New Message from Mentor</div>
+                    <div class="activity-time">3 days ago • "Great progress on your latest project!"</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-title">🎯 Set New Learning Goals</div>
+                    <div class="activity-time">1 week ago • Focus on lighting techniques</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settingsTab">
+            <h2 class="section-title">Account Settings</h2>
+            <div class="settings-form">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" class="form-input" id="settingsName" placeholder="Enter your full name" value="John Filmmaker">
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" class="form-input" id="settingsEmail" placeholder="Enter your email" value="filmmaker@cinda.com" readonly style="opacity: 0.7;">
+                    <small style="color: #999; font-size: 12px;">Email cannot be changed for security reasons</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Bio</label>
+                    <textarea class="form-input" id="settingsBio" placeholder="Tell us about yourself">Passionate filmmaker dedicated to telling authentic Rwandan stories through compelling visuals and meaningful narratives.</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" class="form-input" id="settingsLocation" placeholder="City, Country" value="Kigali, Rwanda">
+                </div>
+
+                <div class="form-group">
+                    <label>Specialization</label>
+                    <input type="text" class="form-input" id="settingsSpecialization" placeholder="e.g., Cinematography, Directing, Editing" value="Cinematography, Directing">
+                </div>
+
+                <div class="form-group">
+                    <label>Website/Portfolio URL</label>
+                    <input type="url" class="form-input" id="settingsWebsite" placeholder="https://yourwebsite.com">
+                </div>
+
+                <button class="btn-primary" onclick="saveSettings()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Use the global API instance
+        const api = getAPI();
+        let userProfileData = null;
+        let authCheckInProgress = false;
+
+        // Prevent multiple auth checks
+        function checkAuthentication() {
+            if (authCheckInProgress) return;
+            authCheckInProgress = true;
+
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    // Only redirect if not already on authentication page
+                    if (!window.location.href.includes('authentication.html')) {
+                        alert('Please sign in to access your profile');
+                        window.location.href = 'authentication.html';
+                    }
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Auth check error:', error);
+                return false;
+            } finally {
+                authCheckInProgress = false;
+            }
+        }
+
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.authGuard && window.authGuard.initProtectedPage()) {
+                loadUserProfile();
+            }
+        });
+
+        async function loadUserProfile() {
+            try {
+                const profile = await api.getProfile();
+                if (profile) {
+                    updateProfileDisplay(profile);
+                }
+            } catch (error) {
+                console.error('Failed to load profile:', error);
+            }
+        }
+
+        // Load user data
+        const userType = sessionStorage.getItem('userType') || 'filmmaker';
+        const userEmail = sessionStorage.getItem('userEmail') || 'user@cinda.com';
+        const socialLogin = sessionStorage.getItem('socialLogin');
+        
+        // Set user initials
+        const email = userEmail.split('@')[0];
+        const initials = email.substring(0, 2).toUpperCase();
+        document.getElementById('userInitials').textContent = initials;
+
+        // Set user name from email
+        const displayName = email.charAt(0).toUpperCase() + email.slice(1).replace(/[0-9]/g, '');
+        document.getElementById('userName').textContent = displayName;
+        document.getElementById('welcomeName').textContent = displayName;
+        document.getElementById('settingsName').value = displayName;
+        document.getElementById('settingsEmail').value = userEmail;
+
+        // Set user role based on type
+        const roleMap = {
+            'filmmaker': 'Filmmaker & Content Creator',
+            'mentor': 'Industry Mentor',
+            'sponsor': 'Sponsor & Investor'
+        };
+        document.getElementById('userRole').textContent = roleMap[userType] || 'Filmmaker';
+
+        // Update bio based on user type
+        const bioMap = {
+            'filmmaker': 'Passionate filmmaker dedicated to telling authentic Rwandan stories through compelling visuals and meaningful narratives.',
+            'mentor': 'Experienced film professional dedicated to nurturing the next generation of African filmmakers through mentorship and guidance.',
+            'sponsor': 'Supporting emerging talent in the African film industry through strategic partnerships and funding opportunities.'
+        };
+        document.getElementById('userBio').textContent = bioMap[userType] || bioMap['filmmaker'];
+        document.getElementById('settingsBio').value = bioMap[userType] || bioMap['filmmaker'];
+
+        // Dropdown menu
+        function toggleDropdown() {
+            document.getElementById('dropdownMenu').classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', function(e) {
+            if (!e.target.closest('.user-menu')) {
+                document.getElementById('dropdownMenu').classList.remove('show');
+            }
+        });
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            // Activate corresponding tab button
+            const tabs = document.querySelectorAll('.tab');
+            const tabNames = ['portfolio', 'activity', 'mentorship', 'settings'];
+            const index = tabNames.indexOf(tabName);
+            if (index !== -1) {
+                tabs[index].classList.add('active');
+            }
+
+            // Close dropdown
+            document.getElementById('dropdownMenu').classList.remove('show');
+        }
+
+        // Save settings
+        function saveSettings() {
+            const name = document.getElementById('settingsName').value;
+            const bio = document.getElementById('settingsBio').value;
+            const location = document.getElementById('settingsLocation').value;
+            const specialization = document.getElementById('settingsSpecialization').value;
+            const website = document.getElementById('settingsWebsite').value;
+
+            // Update profile display
+            document.getElementById('userName').textContent = name;
+            document.getElementById('welcomeName').textContent = name;
+            document.getElementById('userBio').textContent = bio;
+
+            alert('✅ Profile settings saved successfully!');
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to sign out?')) {
+                sessionStorage.clear();
+                window.location.href = 'authentication.html';
+            }
+        }
+
+        // Display login method if social login
+        if (socialLogin) {
+            console.log('Logged in via ' + socialLogin);
+        }
+
+        // Show login time
+        const loginTime = sessionStorage.getItem('loginTime');
+        if (loginTime) {
+            console.log('Last login:', new Date(loginTime).toLocaleString());
+        }
+        async function loadUserProfile() {
+  try {
+    const user = await api.getProfile();
+    
+    document.getElementById('userName').textContent = user.name;
+    document.getElementById('welcomeName').textContent = user.name;
+    document.getElementById('userEmail').textContent = user.email;
+    document.getElementById('userRole').textContent = getRoleDisplay(user.userType);
+    document.getElementById('userBio').textContent = user.bio || 'No bio yet';
+    
+    // Update stats
+    if (user.stats) {
+      document.querySelector('.stat-value').textContent = user.stats.projects || 0;
+    }
+    
+  } catch (error) {
+    console.error('Error loading profile:', error);
+    alert('Failed to load profile data');
+  }
+}
+
+function getRoleDisplay(userType) {
+  const roleMap = {
+    'filmmaker': 'Filmmaker & Content Creator',
+    'mentor': 'Industry Mentor',
+    'sponsor': 'Sponsor & Investor'
+  };
+  return roleMap[userType] || 'Filmmaker';
+}
+
+async function saveSettings() {
+  const profileData = {
+    name: document.getElementById('settingsName').value,
+    bio: document.getElementById('settingsBio').value,
+    location: document.getElementById('settingsLocation').value,
+    specialization: document.getElementById('settingsSpecialization').value.split(',').map(s => s.trim()),
+    website: document.getElementById('settingsWebsite').value
+  };
+
+  try {
+    await api.updateProfile(profileData);
+    alert('✅ Profile updated successfully!');
+    loadUserProfile();
+  } catch (error) {
+    alert('❌ Update failed: ' + error.message);
+  }
+}
+
+async function logout() {
+  if (confirm('Are you sure you want to sign out?')) {
+    try {
+      await api.logout();
+      window.location.href = 'index.html';
+    } catch (error) {
+      console.error('Logout error:', error);
+      api.clearAuth();
+      window.location.href = 'index.html';
+    }
+  }
+}
+
+// Load profile on page load
+if (window.location.pathname.includes('profile.html')) {
+  document.addEventListener('DOMContentLoaded', loadUserProfile);
+}
+    </script>
+</body>
+</html>

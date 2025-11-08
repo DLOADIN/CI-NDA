@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opportunities - Ci-NDA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: #141414;
+            color: white;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background-color: #141414;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #e50914;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #b3b3b3;
+        }
+
+        .main-content {
+            padding: 100px 50px 50px;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .page-header p {
+            font-size: 18px;
+            color: #b3b3b3;
+            max-width: 800px;
+        }
+
+        .filter-section {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: #2a2a2a;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: #e50914;
+        }
+
+        .opportunities-list {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .opportunity-card {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 30px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-left: 4px solid #e50914;
+        }
+
+        .opportunity-card:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 20px rgba(229, 9, 20, 0.3);
+        }
+
+        .opportunity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .opportunity-type {
+            display: inline-block;
+            padding: 6px 14px;
+            background: #e50914;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .opportunity-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .opportunity-company {
+            font-size: 16px;
+            color: #46d369;
+            margin-bottom: 15px;
+        }
+
+        .opportunity-description {
+            font-size: 15px;
+            color: #b3b3b3;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .opportunity-details {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #999;
+        }
+
+        .detail-icon {
+            font-size: 18px;
+        }
+
+        .opportunity-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid #3a3a3a;
+        }
+
+        .deadline {
+            font-size: 14px;
+            color: #e50914;
+            font-weight: 600;
+        }
+
+        .apply-btn {
+            padding: 12px 30px;
+            background: #e50914;
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .apply-btn:hover {
+            background: #f40612;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 20px;
+            }
+
+            .main-content {
+                padding: 100px 20px 50px;
+            }
+
+            .page-header h1 {
+                font-size: 32px;
+            }
+
+            .opportunity-card {
+                padding: 20px;
+            }
+
+            .opportunity-title {
+                font-size: 22px;
+            }
+
+            .search-container {
+                max-width: 200px;
+            }
+        }
+
+        /* Additional styles for dynamic content */
+        .apply-btn.applied {
+            background: #28a745;
+            cursor: not-allowed;
+        }
+
+        .apply-btn:disabled,
+        .apply-btn.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #666;
+        }
+
+        .deadline.expired {
+            color: #ff6b6b;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 40px;
+            background: #2a1a1a;
+            border-radius: 8px;
+            margin: 20px;
+            max-width: 600px;
+        }
+
+        .error-message h3 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+
+        .retry-btn {
+            background: #e50914;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .retry-btn:hover {
+            background: #b8070f;
+        }
+
+        .no-opportunities {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+            font-size: 18px;
+            background: #2a1a1a;
+            border-radius: 8px;
+            margin: 20px;
+        }
+
+        .loading-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            max-width: 600px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #333;
+            border-top: 5px solid #e50914;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Search and auth styles */
+        .search-container {
+            position: relative;
+            max-width: 300px;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 8px 15px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 20px;
+            color: white;
+            font-size: 14px;
+        }
+
+        #search-input:focus {
+            outline: none;
+            border-color: #e50914;
+        }
+
+        #search-input::placeholder {
+            color: #888;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .auth-buttons a {
+            padding: 8px 16px;
+            background: #e50914;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background 0.3s;
+            font-size: 14px;
+        }
+
+        .auth-buttons a:hover {
+            background: #b8070f;
+        }
+
+        .user-nav {
+            display: none;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .user-nav a:hover {
+            color: #e50914;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            background-color: #444;
+        }
+
+        .user-name {
+            font-size: 14px;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+<script src="public/js/auth-utils.js"></script>
+<script src="public/js/api.js"></script>
+<script src="public/js/api-init.js"></script>
+    <nav class="navbar">
+        <div class="logo">Ci-NDA</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="courses.html">Courses</a>
+            <a href="opportunities.html" style="color: #e50914;">Opportunities</a>
+            <a href="mentorship.html">Mentorship</a>
+            <a href="portfolios.html">Portfolios</a>
+            
+            <!-- Search functionality -->
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search opportunities...">
+            </div>
+        </div>
+
+        <!-- Authentication buttons for non-logged in users -->
+        <div class="auth-buttons">
+            <a href="authentication.html">Sign In</a>
+            <a href="authentication.html">Register</a>
+        </div>
+
+        <!-- User navigation for logged in users -->
+        <div class="user-nav">
+            <div class="user-avatar"></div>
+            <span class="user-name">User</span>
+            <a href="profile.html">Profile</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <h1>Film Opportunities</h1>
+            <p>Discover grants, competitions, job openings, and collaboration opportunities from leading studios, production companies, and film festivals worldwide.</p>
+        </div>
+
+        <div class="filter-section">
+            <button class="filter-btn active">All</button>
+            <button class="filter-btn">Grants</button>
+            <button class="filter-btn">Jobs</button>
+            <button class="filter-btn">Competitions</button>
+            <button class="filter-btn">Collaborations</button>
+            <button class="filter-btn">Internships</button>
+        </div>
+
+        <div class="opportunities-list">
+            <div class="opportunity-card">
+                <span class="opportunity-type">GRANT</span>
+                <div class="opportunity-header">
+                    <div>
+                        <h3 class="opportunity-title">Independent Film Production Grant</h3>
+                        <p class="opportunity-company">Sundance Institute</p>
+                    </div>
+                </div>
+                <p class="opportunity-description">We're seeking original, compelling narratives from emerging filmmakers. This grant provides $50,000 in production funding, mentorship from industry veterans, and distribution support for your independent feature film project.</p>
+                <div class="opportunity-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">💰</span>
+                        <span>$50,000 Funding</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">📍</span>
+                        <span>Remote/Worldwide</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">🎬</span>
+                        <span>Feature Film</span>
+                    </div>
+                </div>
+                <div class="opportunity-footer">
+                    <span class="deadline">Deadline: 60 days remaining</span>
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="public/js/api.js"></script>
+    <script>
+        let currentPage = 1;
+        let currentFilters = {};
+        let isLoading = false;
+
+        async function loadOpportunities(type = null, reset = false) {
+            if (isLoading) return;
+            
+            isLoading = true;
+            showLoading();
+
+            try {
+                const filters = {
+                    page: reset ? 1 : currentPage,
+                    limit: 10
+                };
+                
+                if (type && type !== 'All') {
+                    // Map frontend filter names to backend types
+                    const typeMap = {
+                        'Grants': 'GRANT',
+                        'Jobs': 'JOB',
+                        'Competitions': 'COMPETITION',
+                        'Collaborations': 'COLLABORATION',
+                        'Internships': 'INTERNSHIP'
+                    };
+                    filters.type = typeMap[type] || type.toUpperCase();
+                }
+
+                // Add search filter if exists
+                const searchInput = document.getElementById('search-input');
+                if (searchInput && searchInput.value.trim()) {
+                    filters.search = searchInput.value.trim();
+                }
+
+                currentFilters = filters;
+                const response = await api.getOpportunities(filters);
+
+                if (response.success) {
+                    const opportunities = response.opportunities || [];
+                    
+                    if (reset) {
+                        clearOpportunities();
+                        currentPage = 1;
+                    }
+                    
+                    renderOpportunities(opportunities);
+                    
+                    // Update pagination
+                    if (response.pagination && response.pagination.hasNext) {
+                        currentPage++;
+                    }
+                } else {
+                    showError('Failed to load opportunities: ' + response.message);
+                }
+            } catch (error) {
+                console.error('Error loading opportunities:', error);
+                showError('Failed to load opportunities. Please check your connection.');
+            } finally {
+                isLoading = false;
+                hideLoading();
+            }
+        }
+
+        function renderOpportunities(opportunities) {
+            const list = document.querySelector('.opportunities-list');
+            if (!list) return;
+
+            if (opportunities.length === 0 && currentPage === 1) {
+                list.innerHTML = '<div class="no-opportunities">No opportunities found matching your criteria.</div>';
+                return;
+            }
+
+            opportunities.forEach(opp => {
+                const oppCard = createOpportunityCard(opp);
+                list.appendChild(oppCard);
+            });
+        }
+
+        function createOpportunityCard(opp) {
+            const card = document.createElement('div');
+            card.className = 'opportunity-card';
+            
+            const details = opp.details || {};
+            const deadline = calculateDaysRemaining(opp.deadline);
+            
+            card.innerHTML = `
+                <span class="opportunity-type">${opp.type}</span>
+                <div class="opportunity-header">
+                    <div>
+                        <h3 class="opportunity-title">${opp.title}</h3>
+                        <p class="opportunity-company">${opp.company}</p>
+                    </div>
+                </div>
+                <p class="opportunity-description">${opp.description}</p>
+                <div class="opportunity-details">
+                    ${details.funding ? `<div class="detail-item"><span class="detail-icon">💰</span><span>${details.funding}</span></div>` : ''}
+                    ${details.location || opp.location ? `<div class="detail-item"><span class="detail-icon">📍</span><span>${details.location || opp.location}</span></div>` : ''}
+                    ${details.duration ? `<div class="detail-item"><span class="detail-icon">⏱️</span><span>${details.duration}</span></div>` : ''}
+                    ${details.category || opp.category ? `<div class="detail-item"><span class="detail-icon">🎬</span><span>${details.category || opp.category}</span></div>` : ''}
+                    ${opp.applicationsCount ? `<div class="detail-item"><span class="detail-icon">👥</span><span>${opp.applicationsCount} applications</span></div>` : ''}
+                </div>
+                <div class="opportunity-footer">
+                    <span class="deadline ${deadline.expired ? 'expired' : ''}">${deadline.text}</span>
+                    <button class="apply-btn ${deadline.expired ? 'disabled' : ''}" 
+                            onclick="applyToOpportunity(${opp.id})" 
+                            ${deadline.expired ? 'disabled' : ''}>
+                        ${deadline.expired ? 'Expired' : getApplyButtonText(opp.type)}
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function calculateDaysRemaining(deadline) {
+            const deadlineDate = new Date(deadline);
+            const now = new Date();
+            const diffTime = deadlineDate - now;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays < 0) {
+                return { 
+                    days: 0, 
+                    expired: true, 
+                    text: 'Deadline: Expired' 
+                };
+            } else if (diffDays === 0) {
+                return { 
+                    days: 0, 
+                    expired: false, 
+                    text: 'Deadline: Today' 
+                };
+            } else if (diffDays === 1) {
+                return { 
+                    days: 1, 
+                    expired: false, 
+                    text: 'Deadline: Tomorrow' 
+                };
+            } else {
+                return { 
+                    days: diffDays, 
+                    expired: false, 
+                    text: `Deadline: ${diffDays} days remaining` 
+                };
+            }
+        }
+
+        function getApplyButtonText(type) {
+            const buttonTexts = {
+                'GRANT': 'Apply Now',
+                'JOB': 'Apply Now',
+                'COMPETITION': 'Submit Entry',
+                'COLLABORATION': 'Express Interest',
+                'INTERNSHIP': 'Apply Now'
+            };
+            return buttonTexts[type] || 'Apply Now';
+        }
+
+        async function applyToOpportunity(opportunityId) {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                alert('Please sign in to apply to opportunities');
+                window.location.href = 'authentication.html';
+                return;
+            }
+
+            const coverLetter = prompt('Please enter a brief cover letter for your application:');
+            if (!coverLetter) {
+                alert('Cover letter is required to submit your application.');
+                return;
+            }
+
+            try {
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Submitting...';
+                button.disabled = true;
+
+                const response = await api.applyToOpportunity(opportunityId, coverLetter);
+                
+                if (response.success) {
+                    button.textContent = 'Applied ✓';
+                    button.classList.add('applied');
+                    alert('✅ Application submitted successfully!');
+                } else {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                    alert('❌ Application failed: ' + response.message);
+                }
+            } catch (error) {
+                console.error('Application error:', error);
+                const button = event.target;
+                button.textContent = 'Apply Now';
+                button.disabled = false;
+                alert('❌ Application failed: ' + error.message);
+            }
+        }
+
+        function clearOpportunities() {
+            const list = document.querySelector('.opportunities-list');
+            if (list) {
+                // Keep the first few static opportunities as examples, remove dynamic ones
+                const staticCards = list.querySelectorAll('.opportunity-card');
+                staticCards.forEach((card, index) => {
+                    if (index > 5) { // Keep first 6 static cards as examples
+                        card.remove();
+                    }
+                });
+            }
+        }
+
+        function showLoading() {
+            const list = document.querySelector('.opportunities-list');
+            let loader = document.getElementById('opportunities-loader');
+            
+            if (!loader) {
+                loader = document.createElement('div');
+                loader.id = 'opportunities-loader';
+                loader.className = 'loading-spinner';
+                loader.innerHTML = '<div class="spinner"></div><p>Loading opportunities...</p>';
+                list.appendChild(loader);
+            }
+            
+            loader.style.display = 'block';
+        }
+
+        function hideLoading() {
+            const loader = document.getElementById('opportunities-loader');
+            if (loader) {
+                loader.style.display = 'none';
+            }
+        }
+
+        function showError(message) {
+            const list = document.querySelector('.opportunities-list');
+            let errorDiv = document.getElementById('opportunities-error');
+            
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.id = 'opportunities-error';
+                errorDiv.className = 'error-message';
+                list.appendChild(errorDiv);
+            }
+            
+            errorDiv.innerHTML = `
+                <div class="error-content">
+                    <h3>⚠️ Error</h3>
+                    <p>${message}</p>
+                    <button onclick="retryLoad()" class="retry-btn">Try Again</button>
+                </div>
+            `;
+            errorDiv.style.display = 'block';
+        }
+
+        async function retryLoad() {
+            const errorDiv = document.getElementById('opportunities-error');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
+            currentPage = 1;
+            await loadOpportunities(null, true);
+        }
+
+        function checkAuthenticationStatus() {
+            const token = localStorage.getItem('authToken');
+            const userNav = document.querySelector('.user-nav');
+            const authButtons = document.querySelector('.auth-buttons');
+            
+            if (token && userNav) {
+                userNav.style.display = 'flex';
+                if (authButtons) authButtons.style.display = 'none';
+                
+                const userData = localStorage.getItem('user');
+                if (userData) {
+                    try {
+                        const user = JSON.parse(userData);
+                        const userAvatar = userNav.querySelector('.user-avatar');
+                        const userName = userNav.querySelector('.user-name');
+                        
+                        if (userAvatar) userAvatar.style.backgroundImage = `url('${user.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&q=80'}')`;
+                        if (userName) userName.textContent = user.name || user.email;
+                    } catch (e) {
+                        console.error('Error parsing user data:', e);
+                    }
+                }
+            } else {
+                if (userNav) userNav.style.display = 'none';
+                if (authButtons) authButtons.style.display = 'flex';
+            }
+        }
+
+        async function logout() {
+            try {
+                await api.logout();
+                localStorage.clear();
+                sessionStorage.clear();
+                alert('Logged out successfully');
+                window.location.reload();
+            } catch (error) {
+                console.error('Logout error:', error);
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.reload();
+            }
+        }
+
+        function handleScroll() {
+            if (isLoading) return;
+            
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            
+            // Load more when user is near the bottom
+            if (scrollTop + windowHeight >= documentHeight - 1000) {
+                loadOpportunities();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load opportunities on page load
+            loadOpportunities(null, true);
+            
+            // Check authentication status
+            checkAuthenticationStatus();
+
+            // Setup filter buttons
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (isLoading) return;
+                    
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    loadOpportunities(this.textContent.trim(), true);
+                });
+            });
+
+            // Setup search functionality if search input exists
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                let searchTimeout;
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(async () => {
+                        currentPage = 1;
+                        await loadOpportunities(null, true);
+                    }, 500);
+                });
+            }
+
+            // Add scroll listener for infinite loading
+            window.addEventListener('scroll', handleScroll);
+        });
+    </script>
+</body>
+</html>

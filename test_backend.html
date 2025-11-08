@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CI-NDA Backend Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .pending {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        button {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #b30710;
+        }
+        .endpoint-test {
+            border-left: 4px solid #e50914;
+            padding-left: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>CI-NDA Backend Connection Test</h1>
+    
+    <div class="test-container">
+        <h2>API Connection Test</h2>
+        <button onclick="testServerConnection()">Test Server Connection</button>
+        <div id="serverTest" class="test-result pending">Click to test server connection</div>
+    </div>
+
+    <div class="test-container">
+        <h2>Authentication Tests</h2>
+        <button onclick="testRegistration()">Test Registration</button>
+        <button onclick="testLogin()">Test Login</button>
+        <div id="authTest" class="test-result pending">Click to test authentication</div>
+    </div>
+
+    <div class="test-container">
+        <h2>API Endpoints Test</h2>
+        <div class="endpoint-test">
+            <h3>Courses API</h3>
+            <button onclick="testEndpoint('/api/courses', 'GET')">Test Get Courses</button>
+            <div id="coursesTest" class="test-result pending">Not tested</div>
+        </div>
+        
+        <div class="endpoint-test">
+            <h3>Opportunities API</h3>
+            <button onclick="testEndpoint('/api/opportunities', 'GET')">Test Get Opportunities</button>
+            <div id="opportunitiesTest" class="test-result pending">Not tested</div>
+        </div>
+        
+        <div class="endpoint-test">
+            <h3>Portfolios API</h3>
+            <button onclick="testEndpoint('/api/portfolios', 'GET')">Test Get Portfolios</button>
+            <div id="portfoliosTest" class="test-result pending">Not tested</div>
+        </div>
+        
+        <div class="endpoint-test">
+            <h3>Mentorships API</h3>
+            <button onclick="testEndpoint('/api/mentorships', 'GET')">Test Get Mentorships</button>
+            <div id="mentorshipsTest" class="test-result pending">Not tested</div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Database Connection Test</h2>
+        <button onclick="testDatabase()">Test Database Connection</button>
+        <div id="databaseTest" class="test-result pending">Click to test database connection</div>
+    </div>
+
+    <script src="public/js/api.js"></script>
+    <script src="public/js/api-init.js"></script>
+    <script>
+        const API_BASE_URL = 'http://localhost:5000';
+        let testToken = null;
+
+        async function testServerConnection() {
+            const resultDiv = document.getElementById('serverTest');
+            resultDiv.innerHTML = 'Testing server connection...';
+            resultDiv.className = 'test-result pending';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = '✅ Server is running! Response: ' + JSON.stringify(data);
+                    resultDiv.className = 'test-result success';
+                } else {
+                    resultDiv.innerHTML = '❌ Server responded with status: ' + response.status;
+                    resultDiv.className = 'test-result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Failed to connect to server: ' + error.message;
+                resultDiv.className = 'test-result error';
+            }
+        }
+
+        async function testRegistration() {
+            const resultDiv = document.getElementById('authTest');
+            resultDiv.innerHTML = 'Testing user registration...';
+            resultDiv.className = 'test-result pending';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'test@cinemafrica.com',
+                        password: 'testpass123',
+                        firstName: 'Test',
+                        lastName: 'User',
+                        userType: 'filmmaker'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = '✅ Registration successful! User created.';
+                    resultDiv.className = 'test-result success';
+                } else {
+                    if (data.message && data.message.includes('already exists')) {
+                        resultDiv.innerHTML = '⚠️ User already exists (this is expected for repeated tests)';
+                        resultDiv.className = 'test-result success';
+                    } else {
+                        resultDiv.innerHTML = '❌ Registration failed: ' + (data.message || 'Unknown error');
+                        resultDiv.className = 'test-result error';
+                    }
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Registration test failed: ' + error.message;
+                resultDiv.className = 'test-result error';
+            }
+        }
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('authTest');
+            resultDiv.innerHTML = 'Testing user login...';
+            resultDiv.className = 'test-result pending';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'test@cinemafrica.com',
+                        password: 'testpass123',
+                        userType: 'filmmaker'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.token) {
+                    testToken = data.token;
+                    resultDiv.innerHTML = '✅ Login successful! Token received and stored for further tests.';
+                    resultDiv.className = 'test-result success';
+                } else {
+                    resultDiv.innerHTML = '❌ Login failed: ' + (data.message || 'No token received');
+                    resultDiv.className = 'test-result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Login test failed: ' + error.message;
+                resultDiv.className = 'test-result error';
+            }
+        }
+
+        async function testEndpoint(endpoint, method = 'GET') {
+            const endpointName = endpoint.split('/').pop();
+            const resultDiv = document.getElementById(endpointName + 'Test');
+            resultDiv.innerHTML = `Testing ${method} ${endpoint}...`;
+            resultDiv.className = 'test-result pending';
+
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                };
+                
+                if (testToken) {
+                    headers['Authorization'] = `Bearer ${testToken}`;
+                }
+
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                    method: method,
+                    headers: headers
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    let message = `✅ ${method} ${endpoint} successful!`;
+                    if (Array.isArray(data)) {
+                        message += ` Returned ${data.length} items.`;
+                    } else if (data.data && Array.isArray(data.data)) {
+                        message += ` Returned ${data.data.length} items.`;
+                    }
+                    resultDiv.innerHTML = message;
+                    resultDiv.className = 'test-result success';
+                } else {
+                    resultDiv.innerHTML = `❌ ${method} ${endpoint} failed: ${data.message || 'Unknown error'}`;
+                    resultDiv.className = 'test-result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ ${method} ${endpoint} test failed: ${error.message}`;
+                resultDiv.className = 'test-result error';
+            }
+        }
+
+        async function testDatabase() {
+            const resultDiv = document.getElementById('databaseTest');
+            resultDiv.innerHTML = 'Testing database connection...';
+            resultDiv.className = 'test-result pending';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/health/db`);
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'connected') {
+                    resultDiv.innerHTML = '✅ Database connection successful!';
+                    resultDiv.className = 'test-result success';
+                } else {
+                    resultDiv.innerHTML = '❌ Database connection failed: ' + (data.message || 'Unknown error');
+                    resultDiv.className = 'test-result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Database test failed: ' + error.message;
+                resultDiv.className = 'test-result error';
+            }
+        }
+
+        // Auto-run server connection test on page load
+        window.addEventListener('load', function() {
+            setTimeout(testServerConnection, 1000);
+        });
+    </script>
+</body>
+</html>

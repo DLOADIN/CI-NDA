@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - CI-NDA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: #141414;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+                        url('https://images.unsplash.com/photo-1485846234645-a62644f84728?w=1600&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .navbar {
+            position: relative;
+            z-index: 1000;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #e50914;
+            letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        .signin-container {
+            position: relative;
+            z-index: 100;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 50px 20px;
+        }
+
+        .signin-box {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 60px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .signin-box h1 {
+            font-size: 32px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #b3b3b3;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px;
+            background: #333;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            background: #454545;
+        }
+
+        .form-input::placeholder {
+            color: #8c8c8c;
+        }
+
+        .error-message {
+            color: #e50914;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .signin-btn {
+            width: 100%;
+            padding: 16px;
+            background: #e50914;
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 30px;
+        }
+
+        .signin-btn:hover {
+            background: #f40612;
+        }
+
+        .signin-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #b3b3b3;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .help-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .help-links a {
+            color: #b3b3b3;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .help-links a:hover {
+            color: white;
+        }
+
+        .signup-prompt {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #333;
+            font-size: 16px;
+            color: #b3b3b3;
+        }
+
+        .signup-prompt a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .signup-prompt a:hover {
+            color: #e50914;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+            color: #b3b3b3;
+            font-size: 14px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #333;
+        }
+
+        .divider span {
+            padding: 0 15px;
+        }
+
+        .social-signin {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .social-btn {
+            width: 100%;
+            padding: 14px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: white;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .social-btn:hover {
+            background: #3a3a3a;
+            border-color: #666;
+        }
+
+        .user-type-selector {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .user-type-btn {
+            flex: 1;
+            padding: 12px;
+            background: #2a2a2a;
+            border: 2px solid #444;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .user-type-btn.active {
+            background: #e50914;
+            border-color: #e50914;
+        }
+
+        .demo-credentials {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            border-left: 3px solid #e50914;
+        }
+
+        .demo-credentials h4 {
+            color: #e50914;
+            margin-bottom: 8px;
+        }
+
+        .demo-credentials p {
+            color: #b3b3b3;
+            margin: 3px 0;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+            color: #46d369;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 20px;
+            }
+
+            .signin-box {
+                padding: 40px 30px;
+            }
+
+            .signin-box h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+<script src="public/js/auth-utils.js"></script>
+<script src="public/js/api.js"></script>
+<script src="public/js/api-init.js"></script>
+    <div class="background"></div>
+
+    <nav class="navbar">
+        <div class="logo" onclick="window.location.href='index.html'">CI-NDA</div>
+    </nav>
+
+    <div class="signin-container">
+        <div class="signin-box">
+            <h1>Sign In</h1>
+
+            <div class="demo-credentials">
+                <h4>Demo Credentials:</h4>
+                <p><strong>Filmmaker:</strong> filmmaker@cinda.com / filmmaker123</p>
+                <p><strong>Mentor:</strong> mentor@cinda.com / mentor123</p>
+                <p><strong>Sponsor:</strong> sponsor@cinda.com / sponsor123</p>
+                <p style="margin-top: 8px; color: #46d369;">Or use any email/password to try!</p>
+            </div>
+
+            <div class="user-type-selector">
+                <button class="user-type-btn active" onclick="selectUserType(this, 'filmmaker')">Filmmaker</button>
+                <button class="user-type-btn" onclick="selectUserType(this, 'mentor')">Mentor</button>
+                <button class="user-type-btn" onclick="selectUserType(this, 'sponsor')">Sponsor</button>
+            </div>
+
+            <form id="authForm">
+                <!-- Registration fields (hidden by default) -->
+                <div class="form-group registration-only" style="display: none;">
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" class="form-input" placeholder="Enter your first name">
+                    <div class="error-message" id="firstNameError">First name is required</div>
+                </div>
+
+                <div class="form-group registration-only" style="display: none;">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" class="form-input" placeholder="Enter your last name">
+                    <div class="error-message" id="lastNameError">Last name is required</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email or Username</label>
+                    <input type="text" id="email" class="form-input" placeholder="Enter your email" required>
+                    <div class="error-message" id="emailError">Please enter a valid email address</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
+                    <div class="error-message" id="passwordError">Password must be at least 6 characters</div>
+                </div>
+
+                <div class="form-group registration-only" style="display: none;">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm your password">
+                    <div class="error-message" id="confirmPasswordError">Passwords do not match</div>
+                </div>
+
+                <button type="submit" class="signin-btn" id="authBtn">Sign In</button>
+                <div class="loading" id="loading">Signing you in...</div>
+
+                <div class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Remember me</label>
+                </div>
+
+                <div class="help-links">
+                    <a href="#">Need help?</a>
+                    <a href="#">Forgot password?</a>
+                </div>
+            </form>
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+            <div class="social-signin">
+                <button class="social-btn" onclick="socialLogin('Google')">
+                    <span>🔵</span>
+                    <span>Continue with Google</span>
+                </button>
+                <button class="social-btn" onclick="socialLogin('Facebook')">
+                    <span>📘</span>
+                    <span>Continue with Facebook</span>
+                </button>
+            </div>
+
+            <div class="signup-prompt">
+                <span id="switchText">New to CI-NDA?</span> 
+                <a href="#" onclick="toggleAuthMode()" id="switchLink">Sign up now</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isLoginMode = true;
+        
+        // Use the global API instance
+        const api = getAPI();
+        
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            const registrationFields = document.querySelectorAll('.registration-only');
+            const switchText = document.getElementById('switchText');
+            const switchLink = document.getElementById('switchLink');
+            const authBtn = document.getElementById('authBtn');
+            const loading = document.getElementById('loading');
+            
+            if (isLoginMode) {
+                // Switch to login mode
+                registrationFields.forEach(field => field.style.display = 'none');
+                switchText.textContent = 'New to CI-NDA?';
+                switchLink.textContent = 'Sign up now';
+                authBtn.textContent = 'Sign In';
+                loading.textContent = 'Signing you in...';
+                
+                // Clear registration-only field requirements
+                document.getElementById('firstName').removeAttribute('required');
+                document.getElementById('lastName').removeAttribute('required');
+                document.getElementById('confirmPassword').removeAttribute('required');
+            } else {
+                // Switch to registration mode
+                registrationFields.forEach(field => field.style.display = 'block');
+                switchText.textContent = 'Already have an account?';
+                switchLink.textContent = 'Sign in';
+                authBtn.textContent = 'Create Account';
+                loading.textContent = 'Creating your account...';
+                
+                // Add registration field requirements
+                document.getElementById('firstName').setAttribute('required', 'required');
+                document.getElementById('lastName').setAttribute('required', 'required');
+                document.getElementById('confirmPassword').setAttribute('required', 'required');
+            }
+            
+            // Clear all error messages
+            document.querySelectorAll('.error-message').forEach(error => {
+                error.style.display = 'none';
+            });
+        }
+
+        document.getElementById('authForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const userType = document.querySelector('.user-type-btn.active').textContent.toLowerCase();
+            const rememberMe = document.getElementById('remember').checked;
+            
+            // Clear all error messages
+            document.querySelectorAll('.error-message').forEach(error => {
+                error.style.display = 'none';
+            });
+            
+            let isValid = true;
+
+            // Validate email
+            if (!email || !validateEmail(email)) {
+                document.getElementById('emailError').style.display = 'block';
+                isValid = false;
+            }
+
+            // Validate password
+            if (!password || password.length < 6) {
+                document.getElementById('passwordError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (!isLoginMode) {
+                // Additional validation for registration
+                const firstName = document.getElementById('firstName').value.trim();
+                const lastName = document.getElementById('lastName').value.trim();
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (!firstName) {
+                    document.getElementById('firstNameError').style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (!lastName) {
+                    document.getElementById('lastNameError').style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (password !== confirmPassword) {
+                    document.getElementById('confirmPasswordError').style.display = 'block';
+                    isValid = false;
+                }
+            }
+
+            if (!isValid) return;
+
+            const authBtn = document.getElementById('authBtn');
+            const loading = document.getElementById('loading');
+            authBtn.disabled = true;
+            loading.style.display = 'block';
+
+            try {
+                if (isLoginMode) {
+                    // Login
+                    const response = await api.login({ email, password, userType });
+                    
+                    sessionStorage.setItem('rememberMe', rememberMe);
+                    sessionStorage.setItem('loginTime', new Date().toISOString());
+                    
+                    if (rememberMe) {
+                        localStorage.setItem('rememberedEmail', email);
+                        localStorage.setItem('rememberedUserType', userType);
+                    }
+                    
+                    alert('✅ Login successful!');
+                    window.location.href = 'profile.html';
+                } else {
+                    // Registration
+                    const firstName = document.getElementById('firstName').value.trim();
+                    const lastName = document.getElementById('lastName').value.trim();
+                    
+                    const response = await api.register({
+                        email,
+                        password,
+                        firstName,
+                        lastName,
+                        userType
+                    });
+                    
+                    alert('✅ Registration successful! Please log in.');
+                    // Switch to login mode after successful registration
+                    toggleAuthMode();
+                    
+                    // Pre-fill email for login
+                    document.getElementById('email').value = email;
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                authBtn.disabled = false;
+                const action = isLoginMode ? 'Login' : 'Registration';
+                alert(`❌ ${action} failed: ${error.message}`);
+            }
+        });
+
+        async function socialLogin(platform) {
+            const userType = document.querySelector('.user-type-btn.active').textContent.toLowerCase();
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+            loading.textContent = `Connecting to ${platform}...`;
+
+            try {
+                const mockUserData = {
+                    email: `user@${platform.toLowerCase()}.com`,
+                    name: `${platform} User`,
+                    provider: platform,
+                    providerId: `${platform}_${Date.now()}`,
+                    userType: userType
+                };
+
+                await api.socialLogin(platform, mockUserData);
+                
+                sessionStorage.setItem('socialLogin', platform);
+                sessionStorage.setItem('loginTime', new Date().toISOString());
+                
+                alert('✅ Social login successful!');
+                window.location.href = 'profile.html';
+            } catch (error) {
+                loading.style.display = 'none';
+                alert('❌ Social login failed: ' + error.message);
+            }
+        }
+
+        function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function selectUserType(button, type) {
+            document.querySelectorAll('.user-type-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+        }
+
+        // Load remembered credentials if available
+        window.addEventListener('load', function() {
+            const rememberedEmail = localStorage.getItem('rememberedEmail');
+            const rememberedUserType = localStorage.getItem('rememberedUserType');
+            
+            if (rememberedEmail) {
+                document.getElementById('email').value = rememberedEmail;
+                document.getElementById('remember').checked = true;
+            }
+            
+            if (rememberedUserType) {
+                document.querySelectorAll('.user-type-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.textContent.toLowerCase() === rememberedUserType) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
