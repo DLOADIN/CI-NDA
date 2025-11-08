@@ -11,8 +11,8 @@ window.CI_NDA = {
   loading: false
 };
 
-// API Configuration
-const API_BASE = window.location.origin;
+// API Configuration - Force Flask server URL regardless of how HTML is served
+const API_BASE = window.location.port === '5500' ? 'http://localhost:5000' : window.location.origin;
 const API_ENDPOINTS = {
   auth: {
     register: '/api/auth/register',

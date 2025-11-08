@@ -125,6 +125,12 @@
     </div>
 
     <script>
+        // API Configuration - Force Flask server URL regardless of how HTML is served
+        const API_BASE_URL = window.location.port === '5500' ? 'http://localhost:5000' : window.location.origin;
+        
+        console.log('Current location:', window.location.href);
+        console.log('Using API Base URL:', API_BASE_URL);
+        
         function showToast(message, type = 'error') {
             const toast = document.getElementById('toast');
             const content = document.getElementById('toastContent');
@@ -161,11 +167,11 @@
             const data = {
                 email: formData.get('email'),
                 password: formData.get('password'),
-                userType: formData.get('userType')
+                user_type: formData.get('userType') // Changed to match backend expected field name
             };
 
             // Validate form
-            if (!data.email || !data.password || !data.userType) {
+            if (!data.email || !data.password || !data.user_type) {
                 showToast('Please fill in all fields');
                 return;
             }
@@ -173,7 +179,10 @@
             setLoading(true);
 
             try {
-                const response = await fetch('/api/auth/login', {
+                console.log('Sending request to:', `${API_BASE_URL}/api/auth/login`);
+                console.log('Request data:', data);
+                
+                const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -181,7 +190,14 @@
                     body: JSON.stringify(data)
                 });
 
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
                 const result = await response.json();
+                console.log('Response result:', result);
 
                 if (result.success) {
                     // Store token and user info
@@ -190,14 +206,14 @@
                     
                     showToast('Sign in successful!', 'success');
                     setTimeout(() => {
-                        window.location.href = 'dashboard.html';
+                        window.location.href = '/dashboard.html';
                     }, 1000);
                 } else {
                     showToast(result.message || 'Sign in failed');
                 }
             } catch (error) {
                 console.error('Signin error:', error);
-                showToast('Network error. Please try again.');
+                showToast(`Network error: ${error.message}`);
             } finally {
                 setLoading(false);
             }
@@ -207,544 +223,9 @@
         window.addEventListener('DOMContentLoaded', function() {
             const token = localStorage.getItem('authToken');
             if (token) {
-                window.location.href = 'dashboard.html';
+                window.location.href = '/dashboard.html';
             }
         });
-    </script>
-</body>
-</html>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background: #141414;
-            color: white;
-        }
-
-        .navbar {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 20px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-            background-color: #141414;
-        }
-
-        .logo {
-            font-size: 32px;
-            font-weight: bold;
-            color: #e50914;
-            letter-spacing: 2px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 25px;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: #b3b3b3;
-        }
-
-        .profile-container {
-            padding: 100px 50px 50px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .profile-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 50px;
-            border-radius: 8px;
-            display: flex;
-            gap: 40px;
-            align-items: center;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-        }
-
-        .profile-avatar {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 64px;
-            border: 5px solid rgba(255,255,255,0.3);
-            flex-shrink: 0;
-        }
-
-        .profile-info {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .profile-name {
-            font-size: 42px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .profile-role {
-            font-size: 18px;
-            color: rgba(255,255,255,0.9);
-            margin-bottom: 20px;
-        }
-
-        .profile-bio {
-            font-size: 16px;
-            line-height: 1.6;
-            color: rgba(255,255,255,0.85);
-            margin-bottom: 20px;
-        }
-
-        .profile-stats {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-
-        .stat-box {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 28px;
-            font-weight: 600;
-            color: white;
-        }
-
-        .stat-label {
-            font-size: 13px;
-            color: rgba(255,255,255,0.7);
-            margin-top: 5px;
-        }
-
-        .edit-profile-btn {
-            padding: 12px 30px;
-            background: rgba(255,255,255,0.2);
-            border: 2px solid white;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 20px;
-        }
-
-        .edit-profile-btn:hover {
-            background: white;
-            color: #764ba2;
-        }
-
-        .profile-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-
-        .content-section {
-            background: #2a2a2a;
-            border-radius: 8px;
-            padding: 30px;
-        }
-
-        .section-title {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .view-all {
-            font-size: 14px;
-            color: #e50914;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        .view-all:hover {
-            color: #f40612;
-        }
-
-        .course-item, .application-item, .mentor-item {
-            padding: 20px;
-            background: #1a1a1a;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            transition: transform 0.3s;
-            cursor: pointer;
-        }
-
-        .course-item:hover, .application-item:hover, .mentor-item:hover {
-            transform: translateX(5px);
-        }
-
-        .item-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .item-subtitle {
-            font-size: 13px;
-            color: #b3b3b3;
-            margin-bottom: 10px;
-        }
-
-        .progress-bar {
-            height: 6px;
-            background: #3a3a3a;
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #46d369;
-            transition: width 0.3s;
-        }
-
-        .progress-text {
-            font-size: 12px;
-            color: #999;
-            margin-top: 5px;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-top: 8px;
-        }
-
-        .status-pending {
-            background: rgba(255, 152, 0, 0.2);
-            color: #ff9800;
-        }
-
-        .status-active {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4caf50;
-        }
-
-        .status-completed {
-            background: rgba(33, 150, 243, 0.2);
-            color: #2196f3;
-        }
-
-        .full-width {
-            grid-column: 1 / -1;
-        }
-
-        .portfolio-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .portfolio-thumbnail {
-            height: 150px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-
-        .portfolio-thumbnail:hover {
-            transform: scale(1.05);
-        }
-
-        .add-project {
-            background: #3a3a3a;
-            border: 2px dashed #666;
-        }
-
-        @media (max-width: 968px) {
-            .profile-content {
-                grid-template-columns: 1fr;
-            }
-
-            .navbar {
-                padding: 20px;
-            }
-
-            .profile-container {
-                padding: 100px 20px 50px;
-            }
-
-            .profile-header {
-                padding: 30px;
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .profile-name {
-                font-size: 32px;
-            }
-        }
-    </style>
-</head>
-<body>
-<script src="public/js/auth-utils.js"></script>
-<script src="public/js/api.js"></script>
-<script src="public/js/api-init.js"></script>
-    <nav class="navbar">
-        <div class="logo">CI-NDA</div>
-        <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="courses.html">Courses</a>
-            <a href="opportunities.html">Opportunities</a>
-            <a href="mentorship.html">Mentorship</a>
-            <a href="portfolios.html">Portfolios</a>
-            <a href="profile.html" style="color: #e50914;">My Profile</a>
-        </div>
-    </nav>
-
-    <div class="profile-container">
-        <div class="profile-header">
-            <div class="profile-avatar">👤</div>
-            <div class="profile-info">
-                <h1 class="profile-name">John Filmmaker</h1>
-                <p class="profile-role">Aspiring Director & Cinematographer</p>
-                <p class="profile-bio">Passionate about visual storytelling and creating meaningful content. Currently learning advanced cinematography techniques and working on my first short film project.</p>
-                <div class="profile-stats">
-                    <div class="stat-box">
-                        <div class="stat-number">5</div>
-                        <div class="stat-label">Courses Enrolled</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">3</div>
-                        <div class="stat-label">Projects</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">2</div>
-                        <div class="stat-label">Applications</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">1</div>
-                        <div class="stat-label">Mentor</div>
-                    </div>
-                </div>
-                <button class="edit-profile-btn">Edit Profile</button>
-            </div>
-        </div>
-
-        <div class="profile-content">
-            <div class="content-section">
-                <div class="section-title">
-                    <span>My Courses</span>
-                    <span class="view-all">View All →</span>
-                </div>
-
-                <div class="course-item">
-                    <div class="item-title">Introduction to Cinematography</div>
-                    <div class="item-subtitle">By Roger Deakins</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 65%;"></div>
-                    </div>
-                    <div class="progress-text">65% Complete • 4 weeks remaining</div>
-                </div>
-
-                <div class="course-item">
-                    <div class="item-title">Film Editing Masterclass</div>
-                    <div class="item-subtitle">By Thelma Schoonmaker</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 40%;"></div>
-                    </div>
-                    <div class="progress-text">40% Complete • 5 weeks remaining</div>
-                </div>
-
-                <div class="course-item">
-                    <div class="item-title">Directing Actors</div>
-                    <div class="item-subtitle">By Martin Scorsese</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 20%;"></div>
-                    </div>
-                    <div class="progress-text">20% Complete • 8 weeks remaining</div>
-                </div>
-            </div>
-
-            <div class="content-section">
-                <div class="section-title">
-                    <span>My Applications</span>
-                    <span class="view-all">View All →</span>
-                </div>
-
-                <div class="application-item">
-                    <div class="item-title">Independent Film Grant</div>
-                    <div class="item-subtitle">Sundance Institute</div>
-                    <span class="status-badge status-pending">Under Review</span>
-                </div>
-
-                <div class="application-item">
-                    <div class="item-title">Short Film Competition</div>
-                    <div class="item-subtitle">Cannes Short Film Corner</div>
-                    <span class="status-badge status-active">Submitted</span>
-                </div>
-            </div>
-
-            <div class="content-section">
-                <div class="section-title">
-                    <span>My Mentorship</span>
-                    <span class="view-all">View Details →</span>
-                </div>
-
-                <div class="mentor-item">
-                    <div class="item-title">Sarah Mitchell</div>
-                    <div class="item-subtitle">Award-Winning Cinematographer</div>
-                    <span class="status-badge status-active">Active Mentorship</span>
-                    <div class="progress-text" style="margin-top: 10px;">Next session: Tomorrow, 3:00 PM</div>
-                </div>
-            </div>
-
-            <div class="content-section">
-                <div class="section-title">
-                    <span>Recent Activity</span>
-                </div>
-
-                <div class="application-item">
-                    <div class="item-title">Completed Quiz: Camera Basics</div>
-                    <div class="item-subtitle">2 days ago • Score: 95%</div>
-                </div>
-
-                <div class="application-item">
-                    <div class="item-title">Uploaded Project: City Lights</div>
-                    <div class="item-subtitle">5 days ago • 234 views</div>
-                </div>
-
-                <div class="application-item">
-                    <div class="item-title">Received Mentor Feedback</div>
-                    <div class="item-subtitle">1 week ago • Sarah Mitchell</div>
-                </div>
-            </div>
-
-            <div class="content-section full-width">
-                <div class="section-title">
-                    <span>My Portfolio</span>
-                    <span class="view-all">Manage Portfolio →</span>
-                </div>
-
-                <div class="portfolio-grid">
-                    <div class="portfolio-thumbnail" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                        🎬
-                    </div>
-                    <div class="portfolio-thumbnail" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                        🎥
-                    </div>
-                    <div class="portfolio-thumbnail" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                        🎞️
-                    </div>
-                    <div class="portfolio-thumbnail add-project">
-                        <span style="font-size: 48px;">+</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Use the global API instance
-        const api = getAPI();
-
-        // Check authentication on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Use auth guard to prevent reload loops
-            if (window.authGuard && window.authGuard.initProtectedPage()) {
-                loadUserProfile();
-            }
-            setupEventHandlers();
-        });
-
-        async function loadUserProfile() {
-            try {
-                const profile = await api.getProfile();
-                if (profile) {
-                    updateProfileDisplay(profile);
-                }
-            } catch (error) {
-                console.error('Failed to load profile:', error);
-            }
-        }
-
-        function updateProfileDisplay(profile) {
-            // Update profile name
-            if (profile.firstName && profile.lastName) {
-                document.querySelector('.profile-name').textContent = `${profile.firstName} ${profile.lastName}`;
-            } else if (profile.email) {
-                const username = profile.email.split('@')[0];
-                document.querySelector('.profile-name').textContent = username.charAt(0).toUpperCase() + username.slice(1);
-            }
-
-            // Update role based on user type
-            if (profile.userType) {
-                const roleMap = {
-                    'filmmaker': 'Aspiring Director & Cinematographer',
-                    'mentor': 'Industry Professional & Mentor',
-                    'sponsor': 'Film Industry Sponsor & Investor'
-                };
-                document.querySelector('.profile-role').textContent = roleMap[profile.userType] || 'Filmmaker';
-            }
-
-            // Update bio if available
-            if (profile.bio) {
-                document.querySelector('.profile-bio').textContent = profile.bio;
-            }
-        }
-
-        function setupEventHandlers() {
-            // Edit profile button
-            const editBtn = document.querySelector('.edit-profile-btn');
-            if (editBtn) {
-                editBtn.addEventListener('click', function() {
-                    const action = confirm('Edit Profile (OK) or Logout (Cancel)?');
-                    if (action) {
-                        alert('Profile editing feature coming soon!');
-                    } else {
-                        const confirmLogout = confirm('Are you sure you want to logout?');
-                        if (confirmLogout && window.authGuard) {
-                            window.authGuard.logout();
-                        }
-                    }
-                });
-            }
-
-            // View all links
-            document.querySelectorAll('.view-all').forEach(link => {
-                link.addEventListener('click', function() {
-                    const section = this.parentElement.querySelector('span').textContent;
-                    alert(`Viewing all ${section}...`);
-                });
-            });
-        }
     </script>
 </body>
 </html>

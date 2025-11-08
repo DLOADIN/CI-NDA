@@ -29,7 +29,7 @@ app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'jwt-secret-key-chang
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(seconds=int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES', '86400')))
 
 # CORS configuration
-CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:3000,http://127.0.0.1:5500').split(',')
+CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:3000,http://127.0.0.1:5500,http://localhost:5000').split(',')
 CORS(app, supports_credentials=True, origins=CORS_ORIGINS)
 
 # Database configuration from environment variables
@@ -92,6 +92,15 @@ def close_db(error):
 def index():
     """Serve main page"""
     return app.send_static_file('index.html')
+
+@app.route('/api/test')
+def test_api():
+    """Test endpoint to verify API is working"""
+    return jsonify({
+        'success': True,
+        'message': 'CI-NDA API is working!',
+        'timestamp': datetime.datetime.now().isoformat()
+    })
 
 @app.route('/<path:filename>')
 def serve_static(filename):

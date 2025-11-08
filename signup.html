@@ -129,6 +129,12 @@
     </div>
 
     <script>
+        // API Configuration - Force Flask server URL regardless of how HTML is served
+        const API_BASE_URL = window.location.port === '5500' ? 'http://localhost:5000' : window.location.origin;
+        
+        console.log('Current location:', window.location.href);
+        console.log('Using API Base URL:', API_BASE_URL);
+        
         function showToast(message, type = 'error') {
             const toast = document.getElementById('toast');
             const content = document.getElementById('toastContent');
@@ -166,11 +172,11 @@
                 name: formData.get('name'),
                 email: formData.get('email'),
                 password: formData.get('password'),
-                userType: formData.get('userType')
+                user_type: formData.get('userType') // Changed to match backend expected field name
             };
 
             // Validate form
-            if (!data.name || !data.email || !data.password || !data.userType) {
+            if (!data.name || !data.email || !data.password || !data.user_type) {
                 showToast('Please fill in all fields');
                 return;
             }
@@ -183,7 +189,10 @@
             setLoading(true);
 
             try {
-                const response = await fetch('/api/auth/register', {
+                console.log('Sending request to:', `${API_BASE_URL}/api/auth/register`);
+                console.log('Request data:', data);
+                
+                const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -191,19 +200,26 @@
                     body: JSON.stringify(data)
                 });
 
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
                 const result = await response.json();
+                console.log('Response result:', result);
 
                 if (result.success) {
                     showToast('Account created successfully!', 'success');
                     setTimeout(() => {
-                        window.location.href = 'signin.html';
+                        window.location.href = '/signin.html';
                     }, 2000);
                 } else {
                     showToast(result.message || 'Registration failed');
                 }
             } catch (error) {
                 console.error('Signup error:', error);
-                showToast('Network error. Please try again.');
+                showToast(`Network error: ${error.message}`);
             } finally {
                 setLoading(false);
             }
